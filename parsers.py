@@ -60,8 +60,9 @@ def item_parser(row: Dict) -> tuple:
 #         "vat_id": row["vat_id"] if row["vat_id"] != "Empty" else None,
 #         "tax_id": row["tax_id"] if row["tax_id"] != "Empty" else None,
 #         "bank_account": row["bank_account"] if row["bank_account"] != "Empty" else None,
-    # }
-    # return data.get("_entity_id"), data
+# }
+# return data.get("_entity_id"), data
+
 
 def legal_entity_parser(row: dict) -> tuple:
     data = {
@@ -79,6 +80,7 @@ def legal_entity_parser(row: dict) -> tuple:
         "bank_account": row["bank_account"],
     }
     return data.get("_entity_id"), data, "LegalEntity"
+
 
 def private_entity_parser(row: dict) -> tuple:
     data = {

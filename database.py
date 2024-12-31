@@ -2,12 +2,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any
 from datetime import date
-from prompts import db_item_creator
+from prompts import db_i_creator, VAT_CATEGORIES
 from enum import StrEnum
 from parsers import parse
 import json
 import csv
-
+from prompts import VALID_ENTITIES, VALID_ITEMS_IDS, VALID_ITEM_NAMES
 
 
 
@@ -20,7 +20,6 @@ class Entity:
     postal_code: str
     email: str
     phone_no: str
-
 
     def serialize(self) -> dict:
         serialized = {
@@ -60,51 +59,29 @@ class Entity:
         fields.extend(list(LegalEntity.__annotations__.keys()))
         return fields
 
-    # def parser(self, row: dict) -> Dict:
-    #     data = {
-    #         "_entity_id": int(row["_entity_id"]),
-    #         "street_number": row["street_number"],
-    #         "city": row["city"],
-    #         "country": row["country"],
-    #         "postal_code": row["postal_code"],
-    #         "email": row["email"],
-    #         "phone_no": row["phone_no"],
-    #         "first_name": row["first_name"] if row["first_name"] != "Empty" else None,
-    #         "second_name": row["second_name"] if row["second_name"] != "Empty" else None,
-    #         "last_name": row["last_name"] if row["last_name"] != "Empty" else None,
-    #         "company_name": row["company_name"] if row["company_name"] != "Empty" else None,
-    #         "vat_id": row["vat_id"] if row["vat_id"] != "Empty" else None,
-    #         "tax_id": row["tax_id"] if row["tax_id"] != "Empty" else None,
-    #         "bank_account": row["bank_account"] if row["bank_account"] != "Empty" else None,
-    #     }
-    #     return data
 
 @dataclass
 class IndivEntity(Entity):
-    ent_type: str
     first_name: str
     second_name: str
     last_name: str
-
-
+    ent_type: str = "IndivEntity"
 
 
 @dataclass
 class LegalEntity(Entity):
-    ent_type: str
     company_name: str
     vat_id: str
     tax_id: str
-    bank_account: str  
+    bank_account: str
+    ent_type: str = "LegalEntity"
     # additional_attrs: Dict[str, Any] = field(default_factory=dict, init=False)
-    
+
     # def __post_init__(self, **kwargs):
     #     # Store any additional keyword arguments in the additional_attrs dictionary
     #     self.additional_attrs = {k: v for k, v in kwargs.items() if k not in self.__annotations__}
     #     for k, v in self.additional_attrs.items():
     #         setattr(self, k, v)
-
-
 
 
 @dataclass
@@ -124,20 +101,29 @@ class Item:
 
     def serialize(self) -> dict:
         return asdict(self)
+    
+    @property
+    def vat_category(self) -> str:
+        return self._vat_category
+    
+    @vat_category.setter
+    def vat_category(self, value: str) -> None:
+        if value not in VAT_CATEGORIES.keys():
+            raise ValueError("Invalid VAT category")
+        self._vat_category = value
+    
+    @property
+    def price_per_unit(self) -> float:
+        return self._price_per_unit
+    
+    @price_per_unit.setter
+    def price_per_unit(self, value: float) -> None:
+        self._price_per_unit = float(value)
 
-    # def parser(self, row: dict) -> Dict:
-    #     data = {
-    #         "_item_id": int(row["_item_id"]),
-    #         "item_name": row["item_name"],
-    #         "item_decription": row["item_decription"],
-    #         "item_unit": row["item_unit"],
-    #         "price_per_unit": int(row["price_per_unit"]),
-    #         "vat_category": row["vat_category"],
-    #         "_valid": bool(row["_valid"]),
-    #         "_currency": row["_currency"],
-    #     }
-    #     return data
-
+    @property
+    def price_with_vat(self) -> float:
+        vat = VAT_CATEGORIES.get(self.vat_category)
+        return self.price_per_unit * (1 + vat / 100)
 
 @dataclass
 class PurchaseOrder:
@@ -156,19 +142,26 @@ class PurchaseOrder:
 
     def serialize(self) -> dict:
         return asdict(self)
+    
+    @property
+    def buyer_id(self) -> int:
+        return self._buyer_id
+    
+    @buyer_id.setter
+    def buyer_id(self, value: int) -> None:
+        if value not in VALID_ENTITIES:
+            raise ValueError("Invalid buyer ID")
+        self._buyer_id = value
 
-    # def parser(self, row: dict) -> Dict:
-    #     data = {
-    #         "_order_no": int(row["_order_no"]),
-    #         "date_order": date(row["date_order"]),
-    #         "buyer_id": int(row["buyer_id"]),
-    #         "seller_id": int(row["seller_id"]),
-    #         "db": list(row["db"]),
-    #         "_invoice_no": int(row["_invoice_no"]),
-    #         "date_issued": date(row["date_issued"]),
-    #         "maturity": int(row["maturity"]),
-    #     }
-    #     return data
+    @property
+    def seller_id(self) -> int:
+        return self._seller_id
+    
+    @seller_id.setter
+    def seller_id(self, value: int) -> None:
+        if value not in VALID_ENTITIES:
+            raise ValueError("Invalid seller ID")
+        self._seller_id = value
 
 
 # @dataclass
@@ -214,8 +207,8 @@ class Database:
     db: Dict[int, Item | Entity | PurchaseOrder] = field(default_factory=dict)
 
     files = {
-        "Item": "database_items.csv",
-        "Entity": "database_entities.csv",
+        "Item": "database_items.json",
+        "Entity": "database_entities.json",
         "PurchaseOrder": "databese_POs.json",
     }
     class_map = {
@@ -226,23 +219,23 @@ class Database:
         "PurchaseOrder": PurchaseOrder,
     }
 
-    def add_to_db(self, item=0, id=0) -> None:
+    def add_to_db(self, db_i=0, id=0) -> None:
         if id == 0:
             id = self.max_id()
-        if item == 0:
-            data = db_item_creator(
+        if db_i == 0:
+            data, ent_type = db_i_creator(
                 self.db_type,
                 id,
-                db_ids=self.db.keys(),
-                db_names=self.get_items_att("item_name"),
+                # db_ids=self.db.keys(),
+                # db_names=self.get_db_i_att("item_name"),
             )
             if data:
-                item = self.db_class_type()(**data)
-                self.db[id] = item
+                db_i = self.db_class_type(ent_type)(**data)
+                self.db[id] = db_i
             else:
                 print("======\nIterupted by user\n=======\n")
                 return None
-        self.db[id] = item
+        self.db[id] = db_i
 
     def max_id(self) -> int:
         try:
@@ -252,10 +245,10 @@ class Database:
             id = 1
         return id
 
-    def get_items_att(self, item_att_name) -> List[int]:
+    def get_db_i_att(self, db_i_att_name) -> List[int]:
         """Return a list of ussed values for given attribute name"""
-        return [getattr(item, item_att_name) for item in self.db.values()]
-        # return [item for item in self.db.keys() if isinstance(self.db[item], Item)]
+        return [getattr(db_i, db_i_att_name) for db_i in self.db.values()]
+        # return [db_i for db_i in self.db.keys() if isinstance(self.db[db_i], Item)]
 
     def db_class_type(self, ent_type=0) -> type:
         if ent_type == 0:
@@ -273,14 +266,14 @@ class Database:
             print("File format not supported!")
             return None
         try:
-            with open(file_name, "w",encoding="utf-8", newline="") as f:
+            with open(file_name, "w", encoding="utf-8", newline="") as f:
                 if file_format == "JSON":
                     json.dump(self.db, f, default=lambda x: x.serialize())
                 elif file_format == "CSV":
                     writer = csv.DictWriter(f, fieldnames=self.db_class_type().header())
                     writer.writeheader()
-                    for db_item in self.db.values():
-                        writer.writerow(db_item.serialize())
+                    for db_i in self.db.values():
+                        writer.writerow(db_i.serialize())
         except Exception as e:
             print(f"Exception {e} occurred!")
             return None
@@ -297,18 +290,17 @@ class Database:
         try:
             with open(file_name, "r") as f:
                 if file_format == "JSON":
-                    date = json.load(f)
-                    for value in date.values():
+                    data = json.load(f)
+                    for value in data.values():
                         id, data, ent_type = parse(value, self.db_type)
-                        item = self.db_class_type(ent_type)(**data)
-                        self.db[id] = item
-                    self.db = json.load(f)
+                        db_i = self.db_class_type(ent_type)(**data)
+                        self.db[id] = db_i
                 elif file_format == "CSV":
                     reader = csv.DictReader(f)
                     for row in reader:
                         id, data, ent_type = parse(row, self.db_type)
-                        item = self.db_class_type(ent_type)(**data)
-                        self.db[id] = item
+                        db_i = self.db_class_type(ent_type)(**data)
+                        self.db[id] = db_i
         except Exception as e:
             print(f"Exception {e} occurred!")
             return None

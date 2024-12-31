@@ -42,10 +42,12 @@ def valid_number(answers=0, current=0):
 
 
 def valid_mail(answers=0, current=0):
-    if validators.email(current):
-        return True
-    else:
+    try:
+        validators.email(current)
+    except Exception as e:
+        print(e)
         return False
+    return True
 
 
 if __name__ == "__main__":
