@@ -7,7 +7,8 @@ from enum import StrEnum
 from parsers import parse
 import json
 import csv
-from prompts import VALID_ENTITIES, VALID_ITEMS_IDS, VALID_ITEM_NAMES
+import ast
+from prompts import VALID_ENTITIES, VALID_ITEMS_IDS_NAMES
 
 
 
@@ -31,24 +32,31 @@ class Entity:
             "email": self.email,
             "phone_no": self.phone_no,
             "ent_type": self.ent_type,
+            "first_name": self.first_name if hasattr(self, "first_name") else "Empty",
+            "second_name": self.second_name if hasattr(self, "second_name") else "Empty",
+            "last_name": self.last_name if hasattr(self, "last_name") else "Empty",
+            "company_name": self.company_name if hasattr(self, "company_name") else "Empty",
+            "vat_id": self.vat_id if hasattr(self, "vat_id") else "Empty",
+            "tax_id": self.tax_id if hasattr(self, "tax_id") else "Empty",
+            "bank_account":self.bank_account if hasattr(self, "bank_account") else "Empty",
         }
-        serialized["first_name"] = (
-            self.first_name if hasattr(self, "first_name") else "Empty"
-        )
-        serialized["second_name"] = (
-            self.second_name if hasattr(self, "second_name") else "Empty"
-        )
-        serialized["last_name"] = (
-            self.last_name if hasattr(self, "last_name") else "Empty"
-        )
-        serialized["company_name"] = (
-            self.company_name if hasattr(self, "company_name") else "Empty"
-        )
-        serialized["vat_id"] = self.vat_id if hasattr(self, "vat_id") else "Empty"
-        serialized["tax_id"] = self.tax_id if hasattr(self, "tax_id") else "Empty"
-        serialized["bank_account"] = (
-            self.bank_account if hasattr(self, "bank_account") else "Empty"
-        )
+        # serialized["first_name"] = (
+        #     self.first_name if hasattr(self, "first_name") else "Empty"
+        # )
+        # serialized["second_name"] = (
+        #     self.second_name if hasattr(self, "second_name") else "Empty"
+        # )
+        # serialized["last_name"] = (
+        #     self.last_name if hasattr(self, "last_name") else "Empty"
+        # )
+        # serialized["company_name"] = (
+        #     self.company_name if hasattr(self, "company_name") else "Empty"
+        # )
+        # serialized["vat_id"] = self.vat_id if hasattr(self, "vat_id") else "Empty"
+        # serialized["tax_id"] = self.tax_id if hasattr(self, "tax_id") else "Empty"
+        # serialized["bank_account"] = (
+        #     self.bank_account if hasattr(self, "bank_account") else "Empty"
+        # )
         return serialized
 
     @classmethod
@@ -127,41 +135,92 @@ class Item:
 
 @dataclass
 class PurchaseOrder:
-    _order_no: int
-    date_order: date
-    buyer_id: int
-    seller_id: int
-    db: List[Dict[str, int]] = field(default_factory=list)
-    _invoice_no: int = (field(default=0, init=False),)
-    date_issued: date = field(default=0, init=False)
-    maturity: int = field(default=14, init=False)  # user imput from payment terms
+    _po_id: int
+    order_date: date
+    customer_id: int 
+    seller_id: int = field(default=1)
+    purchased_items: List[Dict[str, int]] = field(default_factory=list)  # maybe change to dict?
+    _invoice_id: int = field(default=0)
+    _invoice_issue_date: date = field(default=0)
+    maturity: int = field(default=14)  # user imput from payment terms
 
     @classmethod
     def header(cls) -> List[str]:
         return list(PurchaseOrder.__annotations__.keys())
 
     def serialize(self) -> dict:
-        return asdict(self)
+        serialized = {
+            "_po_id": self._po_id,
+            "order_date": date.isoformat(self.order_date),
+            "customer_id": self.customer_id,
+            "seller_id": self.seller_id,
+            "purchased_items": self.purchased_items,
+            "_invoice_id": self._invoice_id,
+            "_invoice_issue_date": 0 if self._invoice_issue_date == 0 else date.isoformat(self._invoice_issue_date),
+            "maturity": self.maturity,
+        }
+        return serialized
+    
+    def invoce_creator(self, id, invoice_issue_date, maturity):
+        if self._invoice_id == 0:
+            self._invoice_id = id
+            self._invoice_issue_date = invoice_issue_date
+            self.maturity = maturity
     
     @property
-    def buyer_id(self) -> int:
-        return self._buyer_id
+    def order_date(self) -> date:
+        return self._order_date
     
-    @buyer_id.setter
-    def buyer_id(self, value: int) -> None:
-        if value not in VALID_ENTITIES:
-            raise ValueError("Invalid buyer ID")
-        self._buyer_id = value
+    @order_date.setter
+    def order_date(self, value: str) -> None:
+        self._order_date = date.fromisoformat(value)
 
     @property
-    def seller_id(self) -> int:
-        return self._seller_id
+    def customer_id(self) -> int:
+        return self._customer_id
     
-    @seller_id.setter
-    def seller_id(self, value: int) -> None:
-        if value not in VALID_ENTITIES:
-            raise ValueError("Invalid seller ID")
-        self._seller_id = value
+    @customer_id.setter
+    def customer_id(self, value: int) -> None:
+        if int(value) not in list(VALID_ENTITIES.keys()):
+            raise ValueError("Invalid buyer ID")
+        self._customer_id = int(value)
+
+    # @property
+    # def seller_id(self) -> int:
+    #     return self._seller_id
+    
+    # @seller_id.setter
+    # def seller_id(self, value: int) -> None:
+    #     if value not in list(VALID_ENTITIES.keys()):
+    #         raise ValueError("Invalid seller ID")
+    #     self._seller_id = value
+
+    @property
+    def purchased_items(self) -> List[Dict[str, int]]:
+        return self._purchased_items
+    
+    @purchased_items.setter
+    def purchased_items(self, value: List[Dict[str, int]]) -> None:
+        for item in value:
+            if item["item_id"] not in VALID_ITEMS_IDS_NAMES:
+                raise ValueError("Invalid item ID")
+        self._purchased_items = (value)
+
+    @property
+    def invoice_id(self) -> int:
+        return self._invoice_id
+    
+    @invoice_id.setter
+    def invoice_id(self, value: int) -> None:
+        self._invoice_id = int(value)
+
+    @property
+    def invoice_issue_date(self) -> str:
+        return self._invoice_issue_date.isoformat()
+    
+    @invoice_issue_date.setter
+    def invoice_issue_date(self, value: str) -> None:
+        self._invoice_issue_date = date.fromisoformat(value)
 
 
 # @dataclass
@@ -223,15 +282,9 @@ class Database:
         if id == 0:
             id = self.max_id()
         if db_i == 0:
-            data, ent_type = db_i_creator(
-                self.db_type,
-                id,
-                # db_ids=self.db.keys(),
-                # db_names=self.get_db_i_att("item_name"),
-            )
+            data, ent_type = db_i_creator(self.db_type, id)
             if data:
                 db_i = self.db_class_type(ent_type)(**data)
-                self.db[id] = db_i
             else:
                 print("======\nIterupted by user\n=======\n")
                 return None
@@ -246,7 +299,7 @@ class Database:
         return id
 
     def get_db_i_att(self, db_i_att_name) -> List[int]:
-        """Return a list of ussed values for given attribute name"""
+        """Return a list of used values for given attribute name"""
         return [getattr(db_i, db_i_att_name) for db_i in self.db.values()]
         # return [db_i for db_i in self.db.keys() if isinstance(self.db[db_i], Item)]
 
@@ -268,7 +321,7 @@ class Database:
         try:
             with open(file_name, "w", encoding="utf-8", newline="") as f:
                 if file_format == "JSON":
-                    json.dump(self.db, f, default=lambda x: x.serialize())
+                    json.dump(self.db, f, default=lambda x: x.serialize(),indent=4)
                 elif file_format == "CSV":
                     writer = csv.DictWriter(f, fieldnames=self.db_class_type().header())
                     writer.writeheader()
@@ -299,11 +352,22 @@ class Database:
                     reader = csv.DictReader(f)
                     for row in reader:
                         id, data, ent_type = parse(row, self.db_type)
+                        print(data)
                         db_i = self.db_class_type(ent_type)(**data)
                         self.db[id] = db_i
         except Exception as e:
             print(f"Exception {e} occurred!")
             return None
         print("Database loaded from file.\n")
+
+        @property
+        def db_type(self) -> str:
+            return self._db_type
+        
+        @ db_type.setter
+        def db_type(self, value: str) -> None:
+            if value not in self.files.keys():
+                raise ValueError("Invalid db_type")
+            self._db_type = value
 
     # def list_of_ids()?

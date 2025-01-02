@@ -8,6 +8,7 @@ dependencies = [
     "dataclasses>=0.8",
     "datetime>=5.5",
     "inquirer>=3.4.0",
+    "python-dotenv>=1.0.1",
     "typing>=3.10.0.0",
     "validator-collection>=1.5.0",
 ]
