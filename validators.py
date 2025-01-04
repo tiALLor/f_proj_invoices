@@ -1,24 +1,26 @@
 import string
 from validator_collection import validators, errors
+from typing import List, Dict
+from datetime import date
 
 
 LETTERS = {ord(d): str(i) for i, d in enumerate(string.digits + string.ascii_uppercase)}
 
 
-def _number_iban(iban):
+def _number_iban(iban) -> str:
     return (iban[4:] + iban[:4]).translate(LETTERS)
 
 
-def generate_iban_check_digits(iban):
+def generate_iban_check_digits(iban) -> str:
     number_iban = _number_iban(iban[:2] + "00" + iban[4:])
     return "{:0>2}".format(98 - (int(number_iban) % 97))
 
 
-def valid_iban(iban):
+def valid_iban(iban) -> bool:
     return int(_number_iban(iban)) % 97 == 1
 
 
-def iban_is_valid(answers=0, current=0):
+def iban_is_valid(answers=0, current=0) -> bool:
     if current == "None":
         return True
     iban = current.strip()
@@ -29,7 +31,7 @@ def iban_is_valid(answers=0, current=0):
         return False
 
 
-def valid_number(answers=0, current=0):
+def valid_number(answers=0, current=0) -> bool:
     try:
         if current == "":
             print("Value can't be empty.")
@@ -41,9 +43,18 @@ def valid_number(answers=0, current=0):
     return False
 
 
-def valid_mail(answers=0, current=0):
+def valid_mail(answers=0, current=0) -> bool:
     try:
         validators.email(current)
+    except Exception as e:
+        print(e)
+        return False
+    return True
+
+
+def valid_date(answers=0, current=0) -> bool:
+    try:
+        date.fromisoformat(current)
     except Exception as e:
         print(e)
         return False

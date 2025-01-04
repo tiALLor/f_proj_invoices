@@ -1,5 +1,5 @@
 import inquirer
-from validators import iban_is_valid, valid_number, valid_mail
+from validators import iban_is_valid, valid_number, valid_mail, valid_date
 from typing import List, Dict
 from pprint import pprint
 from datetime import date
@@ -18,13 +18,19 @@ def db_i_creator(db_i_class: str, id: int) -> tuple:
         o["_po_id"] = id
     elif db_i_class == "Invoice":
         pass
-    pprint(o)       # debug
+    pprint(o)  # debug
     print("======\n")
     if True in inquirer.prompt(q_confirm).values():
         return o, ent_type if db_i_class == "Entity" else 0
     else:
         return None
-    
+
+
+def confirm() -> bool:
+    if True in inquirer.prompt(q_confirm).values():
+        return True
+    else:
+        return False
 
 
 def entity_creator() -> tuple:
@@ -40,32 +46,55 @@ def entity_creator() -> tuple:
         o = inquirer.prompt(q_legal_entity + q_entity)
         ent_type = "LegalEntity"
     return o, ent_type
-    
 
-def purchase_order_creator() -> tuple:
+
+def purchase_order_creator() -> dict:
     print("======\nMode: Provide PO's data to store the PO into database:\n")
     print(VALID_ENTITIES)  # debug
     o = inquirer.prompt(q_purchase_order)
     o["customer_id"] = int(o["customer_id"])
     o["purchased_items"] = get_purchased_items()
-    o["order_date"] = date.isoformat(date.today())
+    o["order_date"] = date.today().isoformat()
     # o["seller_id"] = 1
     return o
 
 
-def get_purchased_items()-> List:
+def get_purchased_items() -> List:
     db = []
     while True:
         print(VALID_ITEMS_IDS_NAMES)
         o = inquirer.prompt(q_purchase_item)
         db.append({"item_id": int(o["item_ID"]), "item_q_ty": int(o["q_ty"])})
-        q = inquirer.prompt([
-            inquirer.Confirm("more", message="Add another item to purchase order?", default=True)
-        ])
-        if q["more"]== False:
+        q = inquirer.prompt(
+            [
+                inquirer.Confirm(
+                    "more", message="Add another item to purchase order?", default=True
+                )
+            ]
+        )
+        if q["more"] == False:
             break
     return db
-    
+
+
+def invoice() -> Dict:
+    print("\nMode: Provide data to create a invoice:")
+    o = inquirer.prompt(q_invoice)
+    o["maturity"] = int(o["maturity"])
+    o["invoice_issue_date"] = date.fromisoformat(o["invoice_issue_date"])
+    return o
+
+
+def get_operation() -> str:
+    o = inquirer.prompt(q_get_operation)
+    return o
+
+
+def get_po_number() -> int:
+    o = inquirer.prompt(q_get_po_number)
+    o = int(o["po_id"])
+    return o
+
 
 VAT_CATEGORIES: Dict[str, int] = {
     "food": 5,
@@ -79,29 +108,37 @@ item_units = ["pcs", "m", "m2", "m3", "sets", "liters"]
 
 
 VALID_ENTITIES = {}
-'''Stores valid entity_ids: name from the database entities.db  for validation'''
+"""Stores valid entity_ids: name from the database entities.db  for validation"""
 
 VALID_ITEMS_IDS_NAMES = {}
-'''Stores valid item_ids: names from the database items.db to for validation'''
-
-
+"""Stores valid item_ids: names from the database items.db to for validation"""
 
 
 q_indiv_entity = [
-    inquirer.Text("first_name", message="First name", validate=lambda _, x: x.strip() != ""),
+    inquirer.Text(
+        "first_name", message="First name", validate=lambda _, x: x.strip() != ""
+    ),
     inquirer.Text(
         "second_name",
         message="Middle name (optional)",
         validate=lambda _, x: x.strip() != "",
         default="None",
     ),
-    inquirer.Text("last_name", message="Last name", validate=lambda _, x: x.strip() != ""),
+    inquirer.Text(
+        "last_name", message="Last name", validate=lambda _, x: x.strip() != ""
+    ),
 ]
 
 q_legal_entity = [
-    inquirer.Text("company_name", message="Company's name", validate=lambda _, x: x.strip() != ""),
-    inquirer.Text("vat_id", message="VAT number", validate=lambda _, x: x.strip() != ""),
-    inquirer.Text("tax_id", message="TAX number", validate=lambda _, x: x.strip() != ""),
+    inquirer.Text(
+        "company_name", message="Company's name", validate=lambda _, x: x.strip() != ""
+    ),
+    inquirer.Text(
+        "vat_id", message="VAT number", validate=lambda _, x: x.strip() != ""
+    ),
+    inquirer.Text(
+        "tax_id", message="TAX number", validate=lambda _, x: x.strip() != ""
+    ),
     inquirer.Text(
         "bank_account",
         message="Bank account number",
@@ -132,16 +169,16 @@ q_entity = [
 
 
 q_item = [
-    inquirer.Text("item_name", message="Item name", validate=lambda _, x: x.strip() != ""),
+    inquirer.Text(
+        "item_name", message="Item name", validate=lambda _, x: x.strip() != ""
+    ),
     inquirer.Text(
         "item_decription",
         message="Item decription (optional)",
         validate=lambda _, x: x.strip() != "",
         default="None",
     ),
-    inquirer.List(
-        "item_unit", message="Item unit", choices=item_units, carousel=True
-    ),
+    inquirer.List("item_unit", message="Item unit", choices=item_units, carousel=True),
     inquirer.Text(
         "price_per_unit",
         message="Price per unit [EUR] (without VAT)",
@@ -181,10 +218,51 @@ q_purchase_item = [
     inquirer.Text(
         "item_ID",
         message="Item ID to be purchased",
-        validate=lambda _, x: x in str(VALID_ITEMS_IDS_NAMES.keys()) and x.strip() != "",
+        validate=lambda _, x: x in str(VALID_ITEMS_IDS_NAMES.keys())
+        and x.strip() != "",
     ),
     inquirer.Text("q_ty", message="Quantity of item units", validate=valid_number),
 ]
 
 
 q_confirm = [inquirer.Confirm("confirm", message="Confirm the action?", default=True)]
+
+q_invoice = [
+    inquirer.Text(
+        "invoice_issue_date",
+        message="The date of invoice was issued(YYYY-MM-DD)",
+        default=date.today().isoformat(),
+        validate=valid_date,
+    ),
+    inquirer.Text(
+        "maturity",
+        message="Maturity of the invoice [days] (from payment terms)",
+        default="14",
+        validate=valid_number,
+    ),
+]
+
+q_get_operation = [
+    inquirer.List(
+        "operation",
+        message="Please choose what you would like to do:",
+        choices=[
+            ("1. Add a Customer (Entity)", "1"),
+            ("2. Add a Item as product or service", "2"),
+            ("3. Create a Purchase Order(PO)", "3"),
+            ("4. Invoice: issue and send to the customer", "4"),
+            ("5. Show Customers (Entities)", "5"),
+            ("6. Show Items (products or servicies)", "6"),
+            ("7. Show Purchase Orders (PO) and Invoices", "7"),
+            ("8. Show purchased items in a PO", "8"),
+            ("9. Quit (End the program)", "9"),
+        ],
+        carousel=True,
+    ),
+]
+
+q_get_po_number = [
+    inquirer.Text(
+        "po_id", message="Please specify the Purchase Order (PO)", validate=valid_number
+    )
+]

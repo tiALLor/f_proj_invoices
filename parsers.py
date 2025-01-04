@@ -77,7 +77,9 @@ def purchase_order_parser(row: dict) -> tuple:
         "seller_id": int(row["seller_id"]),
         "purchased_items": (row["purchased_items"]),
         "_invoice_id": int(row["_invoice_id"]),
-        "_invoice_issue_date": (row["_invoice_issue_date"]),
+        "invoice_issue_date": 0
+        if row["invoice_issue_date"] == 0
+        else date.fromisoformat(row["invoice_issue_date"]),
         "maturity": int(row["maturity"]),
     }
     return data.get("_po_id"), data, 0

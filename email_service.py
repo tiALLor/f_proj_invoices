@@ -1,48 +1,74 @@
-import smtplib 
-from email.mime.multipart import MIMEMultipart 
-from email.mime.text import MIMEText 
-from email.mime.base import MIMEBase 
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 from email import encoders
 from dotenv import load_dotenv
 import os
+from email.message import EmailMessage
 
 load_dotenv()
 
 
-def create_email_message(from_mail: str, to_email: str, subject: str, body: str, filename: str, attachment_path: str) -> MIMEMultipart:
-
-    from_mail = os.getenv("EMAIL")
-    to_email = "recipient_email@example.com"
-    subject = "Email with Attachment"
-    body = "Dear recipient,\n\nPlease find the attached document.\n\nBest regards,\nSender"
+def create_email_message(
+    from_mail: str,
+    to_email: str,
+    subject: str,
+    body: str,
+    filename: str,
+    attachment_path: str,
+) -> MIMEMultipart:
     
+    msg = EmailMessage()
+    msg["From"] = from_mail
+    msg["To"] = to_email
+    msg["Subject"] = subject
+    msg.set_content(body)
 
-    msg = MIMEMultipart()
-    msg['From'] = from_mail
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    
-    body = body
-    msg.attach(MIMEText(body, 'plain'))
+    with open(attachment_path, "rb") as f:
+        file_data = f.read()
+        file_name = filename
 
-    # open the file to be sent  
-    filename = filename                                                    #"File_name_with_extension"
-    attachment_path = attachment_path                                      #"path_to_file/document.pdf"
-    attachment = open(attachment_path, "rb") 
-
-    # instance of MIMEBase
-    p = MIMEBase('application', 'octet-stream') 
-
-    # change the payload into encoded form 
-    p.set_payload((attachment).read())
-    encoders.encode_base64(p) 
-
-    p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-    msg.attach(p)
-
+    msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=file_name)
     return msg
 
-def send_email(to_email: str, subject: str, body: str, filename: str, attachment_path: str) -> None:
+
+
+
+    # from_mail = os.getenv("EMAIL")
+    # to_email = "recipient_email@example.com"
+    # subject = "Invoice"
+    # body = "Dear customer,\n\nPlease find invoice to your Purchase order in the attachement.\n\nBest regards,"
+
+    # msg = MIMEMultipart()
+    # msg["From"] = from_mail
+    # msg["To"] = to_email
+    # msg["Subject"] = subject
+
+    # body = body
+    # msg.attach(MIMEText(body, "plain"))
+
+    # # open the file to be sent
+    # filename = filename                     # "File_name_with_extension"
+    # attachment_path = attachment_path       # "path_to_file/document.pdf"
+    # attachment = open(attachment_path, "rb")
+
+    # # instance of MIMEBase
+    # p = MIMEBase("application", "octet-stream")
+
+    # # change the payload into encoded form
+    # p.set_payload((attachment).read())
+    # encoders.encode_base64(p)
+
+    # p.add_header("Content-Disposition", "attachment; filename= %s" % filename)
+    # msg.attach(p)
+
+    # return msg
+
+
+def send_email(
+    to_email: str, subject: str, body: str, filename: str, attachment_path: str
+) -> None:
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     from_email = os.getenv("EMAIL")
@@ -53,6 +79,18 @@ def send_email(to_email: str, subject: str, body: str, filename: str, attachment
     with smtplib.SMTP(smtp_server, smtp_port) as server:
         server.starttls()
         server.login(from_email, password)
-        server.send_message(from_email, to_email, msg,)
-        # text = msg.as_string()          
+        server.send_message(msg)
+        # s.sendmail(mail_from, mail_to, msg.encode('utf-8'))
+        # text = msg.as_string()
         print("Email sent successfully!")
+
+
+
+if __name__ == "__main__":
+    send_email(
+        to_email="tibor.bebjak@gmail.com",
+        subject="Test",
+        body="Test",
+        filename="Invoice 000003.pdf",
+        attachment_path="PDF_invoice\\Invoice 000003.pdf",
+    )

@@ -32,5 +32,22 @@
         "vat_id": "Empty",
         "tax_id": "Empty",
         "bank_account": "Empty"
+    },
+    "3": {
+        "_entity_id": 3,
+        "street_number": "Za Hornadom 7",
+        "city": "Spisska Nova Ves",
+        "country": "Slovakia",
+        "postal_code": "05201",
+        "email": "tibor.bebjak@gmail.com",
+        "phone_no": "None",
+        "ent_type": "IndivEntity",
+        "first_name": "Tibor",
+        "second_name": "None",
+        "last_name": "Bebjak",
+        "company_name": "Empty",
+        "vat_id": "Empty",
+        "tax_id": "Empty",
+        "bank_account": "Empty"
     }
 }

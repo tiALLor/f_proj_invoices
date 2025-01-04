@@ -1,3 +1,0 @@
-_entity_id,street_number,city,country,postal_code,email,phone_no,ent_type,first_name,second_name,last_name,ent_type,company_name,vat_id,tax_id,bank_account
-1,Aludarių g. 3,Vilnius,Lithuania,LT-LT-01113,study@turingcollege.com,123456789,LegalEntity,Empty,Empty,Empty,LegalEntity,Turing College,LT47395850,4739585,RO13 RZBR 0000 0600 0713 4800
-2,Ferenc Liszt 5,Warsaw,Poland,00-000,JognDoe@gmail.com,123456789,IndivEntity,John,,Doe,IndivEntity,Empty,Empty,Empty,Empty
