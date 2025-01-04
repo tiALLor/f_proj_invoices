@@ -67,7 +67,7 @@ def create_invoice(po_id) -> None:
             return
 
 
-def send_invoice(po_id):
+def send_invoice(po_id) -> None:
     file_name = f"Invoice {po_id:06d}"
     data = get_invoice_data(purchase_orders.db[po_id], items, entities)
     # pprint(data)  # debug
@@ -89,7 +89,7 @@ def send_invoice(po_id):
         print(f"Exception {e} occured.")
 
 
-def show_all_db_i(db):
+def show_all_db_i(db) -> None:
     """Shows all database item's values as a table,
     db example: purchase_orders.db"""
     lines = []
@@ -100,7 +100,7 @@ def show_all_db_i(db):
     show_table(header, lines, "Show all db items")
 
 
-def show_db_i(db_item):
+def show_db_i(db_item)-> None:
     """Shows database item's values as a table,
     db_item example: purchase_orders.db[1]"""
     header = db_item.get_header()
@@ -116,13 +116,16 @@ def primary_screen() -> None:
         if operation == "1":
             entities.add_to_db()
             entities.store_db()
+            update_valid_lists()
         elif operation == "2":
             items.add_to_db()
             items.store_db()
+            update_valid_lists()
         elif operation == "3":
             purchase_orders.add_to_db()
             purchase_orders.store_db()
         elif operation == "4":
+            print("Choose PO number from the list:")
             show_all_db_i(purchase_orders.db)
             po_id = get_po_number()
             if po_id in purchase_orders.db.keys():

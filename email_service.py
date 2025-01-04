@@ -33,39 +33,6 @@ def create_email_message(
     return msg
 
 
-
-
-    # from_mail = os.getenv("EMAIL")
-    # to_email = "recipient_email@example.com"
-    # subject = "Invoice"
-    # body = "Dear customer,\n\nPlease find invoice to your Purchase order in the attachement.\n\nBest regards,"
-
-    # msg = MIMEMultipart()
-    # msg["From"] = from_mail
-    # msg["To"] = to_email
-    # msg["Subject"] = subject
-
-    # body = body
-    # msg.attach(MIMEText(body, "plain"))
-
-    # # open the file to be sent
-    # filename = filename                     # "File_name_with_extension"
-    # attachment_path = attachment_path       # "path_to_file/document.pdf"
-    # attachment = open(attachment_path, "rb")
-
-    # # instance of MIMEBase
-    # p = MIMEBase("application", "octet-stream")
-
-    # # change the payload into encoded form
-    # p.set_payload((attachment).read())
-    # encoders.encode_base64(p)
-
-    # p.add_header("Content-Disposition", "attachment; filename= %s" % filename)
-    # msg.attach(p)
-
-    # return msg
-
-
 def send_email(
     to_email: str, subject: str, body: str, filename: str, attachment_path: str
 ) -> None:
