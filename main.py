@@ -62,9 +62,10 @@ def create_invoice(po_id) -> None:
     except Exception:
         print("Send invoice anyway?")
         if confirm() == True:
-            send_invoice(po_id)
+            ...  # send invoice anyway
         else:
-            return
+            return None
+    send_invoice(po_id)
 
 
 def send_invoice(po_id) -> None:
@@ -132,7 +133,7 @@ def primary_screen() -> None:
                 # creates and sends the invoice
                 create_invoice(po_id)
             else:
-                print("PO number not in database.")
+                print("\nPO number not in database.\n")
         elif operation == "5":
             show_all_db_i(entities.db)
         elif operation == "6":

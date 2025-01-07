@@ -51,5 +51,70 @@
         "_invoice_id": 3,
         "invoice_issue_date": "2025-01-04",
         "maturity": 14
+    },
+    "4": {
+        "_po_id": 4,
+        "order_date": "2025-01-04",
+        "customer_id": 4,
+        "seller_id": 1,
+        "purchased_items": [
+            {
+                "item_id": 1,
+                "item_q_ty": 100
+            },
+            {
+                "item_id": 2,
+                "item_q_ty": 100
+            }
+        ],
+        "_invoice_id": 4,
+        "invoice_issue_date": "2025-01-04",
+        "maturity": 5
+    },
+    "5": {
+        "_po_id": 5,
+        "order_date": "2025-01-05",
+        "customer_id": 3,
+        "seller_id": 1,
+        "purchased_items": [
+            {
+                "item_id": 3,
+                "item_q_ty": 10
+            },
+            {
+                "item_id": 1,
+                "item_q_ty": 10
+            },
+            {
+                "item_id": 2,
+                "item_q_ty": 10
+            }
+        ],
+        "_invoice_id": 5,
+        "invoice_issue_date": "2025-01-05",
+        "maturity": 10
+    },
+    "6": {
+        "_po_id": 6,
+        "order_date": "2025-01-06",
+        "customer_id": 3,
+        "seller_id": 1,
+        "purchased_items": [
+            {
+                "item_id": 4,
+                "item_q_ty": 100
+            },
+            {
+                "item_id": 1,
+                "item_q_ty": 100
+            },
+            {
+                "item_id": 2,
+                "item_q_ty": 100
+            }
+        ],
+        "_invoice_id": 6,
+        "invoice_issue_date": "2025-01-06",
+        "maturity": 10
     }
 }

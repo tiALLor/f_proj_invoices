@@ -18,5 +18,25 @@
         "vat_category": "general",
         "_valid": true,
         "_currency": "EUR"
+    },
+    "3": {
+        "_item_id": 3,
+        "item_name": "Washer 20",
+        "item_decription": "Material SS316",
+        "item_unit": "pcs",
+        "price_per_unit": 0.02,
+        "vat_category": "general",
+        "_valid": true,
+        "_currency": "EUR"
+    },
+    "4": {
+        "_item_id": 4,
+        "item_name": "Toth washer 16",
+        "item_decription": "Material SS",
+        "item_unit": "pcs",
+        "price_per_unit": 0.01,
+        "vat_category": "general",
+        "_valid": true,
+        "_currency": "EUR"
     }
 }

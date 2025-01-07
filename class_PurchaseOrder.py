@@ -11,10 +11,11 @@ class PurchaseOrder:
     _po_id: int
     order_date: date
     customer_id: int
+    invoice_issue_date: date #= field(default=0)
     seller_id: int = field(default=1)
     purchased_items: List[Dict[str, int]] = field(default_factory=list)
     _invoice_id: int = field(default=0)
-    invoice_issue_date: date = field(default=0)
+    
     maturity: int = field(default=0)
 
     @classmethod
@@ -43,6 +44,17 @@ class PurchaseOrder:
     @order_date.setter
     def order_date(self, value: str) -> None:
         self._order_date = date.fromisoformat(value)
+
+    @property
+    def invoice_issue_date(self) -> date:
+        return self._invoice_issue_date
+
+    @invoice_issue_date.setter
+    def invoice_issue_date(self, value: str) -> None:
+        if value == 0:
+            self._invoice_issue_date = value
+        else:
+            self._invoice_issue_date = date.fromisoformat(str(value))
 
     @property
     def customer_id(self) -> int:
@@ -84,13 +96,7 @@ class PurchaseOrder:
     def invoice_id(self, value: int) -> None:
         self._invoice_id = int(value)
 
-    # @property
-    # def invoice_issue_date(self) -> date:
-    #     return self._invoice_issue_date
 
-    # @invoice_issue_date.setter
-    # def invoice_issue_date(self, value: str) -> None:
-    #     self._invoice_issue_date = date.fromisoformat(value)
 
     def create_invoice(self, invoice_id):
         if self._invoice_id == 0:

@@ -90,10 +90,10 @@ class Item:
                 str(self.price_per_unit),
                 self._vat_category,
                 str(q_ty),
-                str(data["item_netto"]),
+                str(f"{data["item_netto"]:.2f}"),
                 str(data["vat_perc"]),
-                str(data["item_vat"]),
-                str(data["item_brutto"]),
+                str(f"{data["item_vat"]:.2f}"),
+                str(f"{(data["item_brutto"]):.2f}"),
             )
         ]
         return line

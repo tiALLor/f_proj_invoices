@@ -49,5 +49,22 @@
         "vat_id": "Empty",
         "tax_id": "Empty",
         "bank_account": "Empty"
+    },
+    "4": {
+        "_entity_id": 4,
+        "street_number": "Za Hornadom 7",
+        "city": "Spisska Nova Ves",
+        "country": "Slovakia",
+        "postal_code": "05201",
+        "email": "livia.bebjakova@gmail.com",
+        "phone_no": "None",
+        "ent_type": "IndivEntity",
+        "first_name": "Livia",
+        "second_name": "None",
+        "last_name": "Bebjakova",
+        "company_name": "Empty",
+        "vat_id": "Empty",
+        "tax_id": "Empty",
+        "bank_account": "Empty"
     }
 }

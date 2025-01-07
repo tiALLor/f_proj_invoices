@@ -1,7 +1,9 @@
 import string
-from validator_collection import validators, errors
+
 from typing import List, Dict
 from datetime import date
+
+from validator_collection import validators, errors
 
 
 LETTERS = {ord(d): str(i) for i, d in enumerate(string.digits + string.ascii_uppercase)}
