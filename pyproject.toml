@@ -1,19 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "capstone1"
+name = "Invoices"
 version = "0.1.0"
-description = "Add your description here"
+description = "Invoice and purchase order management system"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "dataclasses>=0.8",
     "datetime>=5.5",
     "fpdf2>=2.8.2",
     "inquirer>=3.4.0",
     "pytest>=8.3.4",
     "python-dotenv>=1.0.1",
-    "typing>=3.10.0.0",
     "validator-collection>=1.5.0",
 ]
 
-[paths]
-module_path = "/db_classes"
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
+namespaces = true
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.3",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+# Exclude specific folders or files
+exclude = [
+    "tests/",          # skip tests
+    "build/",          # skip build artifacts
+    "src/legacy_code", # skip legacy folder
+    "typings/*"
+]
+
+[tool.pyright]
+# Tell Pyright that "src" is the source root
+include = ["src"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false

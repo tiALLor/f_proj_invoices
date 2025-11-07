@@ -1,0 +1,8 @@
+{
+  "cSpell.words": ["fpdf", "pytest", "venv"],
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "python.analysis.extraPaths": ["./src"]
+}
