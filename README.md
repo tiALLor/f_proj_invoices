@@ -69,7 +69,7 @@ pip install -e .
 Start the interactive CLI:
 
 ```bash
-python main.py
+python -m src.main
 ```
 
 Follow the on-screen prompts to:
@@ -125,7 +125,6 @@ There is a `test_main.py` in the repo. Tests are lightweight and expect the proj
 - Some paths in the code use Windows-style backslashes (e.g. `Fonts\\...` and `PDF_invoice\\...`). On Linux these should still generally work with Python (OS path handling), but you may want to change them to use `os.path.join()` or forward slashes for better portability.
 - The email sending routine requires SMTP configuration (check `.env.example` and set real credentials in a `.env` file if you intend to use the email feature).
 - The `pyproject.toml` lists dependencies
-
 
 ## License
 

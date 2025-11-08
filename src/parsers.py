@@ -11,8 +11,8 @@ def item_parser(row: Dict[str, Any]) -> ParserResult:
         "item_name": row["item_name"],
         "item_description": row["item_description"],
         "item_unit": row["item_unit"],
-        "price_per_unit": float(row["price_per_unit"]),
-        "vat_category": row["vat_category"],
+        "_price_per_unit": float(row["price_per_unit"]),
+        "_vat_category": row["vat_category"],
         "_valid": bool(row["_valid"]),
         "_currency": row["_currency"],
     }
@@ -72,13 +72,13 @@ def purchase_order_parser(row: Dict[str, Any]) -> ParserResult:
 
     data = {
         "_po_id": int(row["_po_id"]),
-        "order_date": str(row["order_date"]),  # Ensure date is handled as a string
-        "customer_id": int(row["customer_id"]),
-        "seller_id": int(row["seller_id"]),
-        "purchased_items": row["purchased_items"],
+        "_order_date": str(row["order_date"]),  # Ensure date is handled as a string
+        "_customer_id": int(row["customer_id"]),
+        "_seller_id": int(row["seller_id"]),
+        "_purchased_items": row["purchased_items"],
         "_invoice_id": int(row["_invoice_id"]),
         # TODO check why its a date value
-        "invoice_issue_date": parsed_issue_date,
+        "_invoice_issue_date": parsed_issue_date,
         "maturity": int(row["maturity"]),
     }
     return data["_po_id"], data, 0

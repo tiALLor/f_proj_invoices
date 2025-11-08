@@ -19,7 +19,7 @@ def get_invoice_data(po, items, entities) -> Dict:
 def get_ent_addr(entity) -> List:
     """Return address of the entity"""
     addr = []
-    addr = entity.get_name() + entity.get_address()
+    addr = [entity.get_name()] + entity.get_address()
     if entity.ent_type == "LegalEntity":
         addr += entity.get_company_data()
     return addr

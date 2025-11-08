@@ -13,7 +13,7 @@ class Entity:
     phone_no: str
     ent_type: Literal["IndivEntity", "LegalEntity"]
 
-    def get_name(self) -> list[str]: ...
+    def get_name(self) -> str: ...
 
     def serialize(self) -> Dict[str, Any]:
         data = asdict(self)
@@ -47,42 +47,46 @@ class Entity:
         return data
 
     @staticmethod
-    def get_header() -> List[str]:
+    def get_header() -> List[Tuple]:
         header = [
-            "Entity no.",
-            "Name",
-            "Street and number",
-            "City",
-            "Postal code",
-            "Country",
-            "E-mail",
-            "Phone number",
-            "Entity type",
-            "VAT no.",
-            "TAX no.",
-            "Bank account",
+            (
+                "Entity no.",
+                "Name",
+                "Street and number",
+                "City",
+                "Postal code",
+                "Country",
+                "E-mail",
+                "Phone number",
+                "Entity type",
+                "VAT no.",
+                "TAX no.",
+                "Bank account",
+            )
         ]
         return header
 
-    def get_i_data(self, entities) -> Tuple[Any, ...]:
+    def get_i_data(self, entities) -> List[Tuple[Any, ...]]:
         """entities are not used in this class, used due to common interface"""
         serialized_data = self.serialize()
 
         # The structure should match the order in get_header (or be consistent)
-        line = (
-            serialized_data["_entity_id"],
-            ",".join(self.get_name()),  # Use the specialized get_name()
-            serialized_data["street_number"],
-            serialized_data["city"],
-            serialized_data["postal_code"],
-            serialized_data["country"],
-            serialized_data["email"],
-            serialized_data["phone_no"],
-            serialized_data["ent_type"],
-            serialized_data["vat_id"],
-            serialized_data["tax_id"],
-            serialized_data["bank_account"],
-        )
+        line = [
+            (
+                serialized_data["_entity_id"],
+                self.get_name(),
+                serialized_data["street_number"],
+                serialized_data["city"],
+                serialized_data["postal_code"],
+                serialized_data["country"],
+                serialized_data["email"],
+                serialized_data["phone_no"],
+                serialized_data["ent_type"],
+                serialized_data["vat_id"],
+                serialized_data["tax_id"],
+                serialized_data["bank_account"],
+            )
+        ]
         # Change the return type to a single tuple, not a set of one tuple.
         return line
 
@@ -93,13 +97,13 @@ class IndivEntity(Entity):
     second_name: str
     last_name: str
 
-    def get_name(self) -> List[str]:
+    def get_name(self) -> str:
         name_parts = [self.first_name]
         if self.second_name and self.second_name != "Empty":
             name_parts.append(self.second_name)
         name_parts.append(self.last_name)
         name = " ".join(name_parts)
-        return [name.upper()]
+        return name.upper()
 
 
 @dataclass
@@ -109,8 +113,8 @@ class LegalEntity(Entity):
     tax_id: str
     bank_account: str
 
-    def get_name(self) -> List[str]:
-        data: List[str] = [f"{self.company_name}"]
+    def get_name(self) -> str:
+        data: str = f"{self.company_name}"
         return data
 
     def get_company_data(self) -> List[str]:

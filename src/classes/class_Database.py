@@ -29,9 +29,9 @@ class Database:
 
     files: Dict[Literal["Item", "Entity", "PurchaseOrder"], str] = field(
         default_factory=lambda: {
-            "Item": "databases/database_items.json",
-            "Entity": "databases/database_entities.json",
-            "PurchaseOrder": "databases/database_POs.json",
+            "Item": "src/databases/database_items.json",
+            "Entity": "src/databases/database_entities.json",
+            "PurchaseOrder": "src/databases/database_POs.json",
         },
         init=False,  # Exclude from constructor
     )

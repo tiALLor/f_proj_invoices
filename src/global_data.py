@@ -9,8 +9,8 @@ VALID_ITEMS_IDS_NAMES: Dict[int, str] = {}
 
 ITEM_UNITS: List[str] = ["pcs", "m", "m2", "m3", "sets", "liters"]
 
+# VAT category and VAT value in %
 VAT_CATEGORIES: Dict[str, int] = {
-    """ VAT category and VAT value in % """
     "food": 5,
     "books": 10,
     "services": 21,

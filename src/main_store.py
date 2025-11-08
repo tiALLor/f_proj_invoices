@@ -1,5 +1,5 @@
 from pprint import pprint
-from .classes.class_Database import (
+from classes.class_Database import (
     IndivEntity,
     LegalEntity,
     Item,
@@ -33,18 +33,19 @@ def database_initialization() -> object:
     """Initializes and loads all databases."""
     global items
     items = Database(initial_db_type="Item")
+    pprint("loading data")
     items.load_db()
 
     global entities
     entities = Database(initial_db_type="Entity")
     entities.load_db()
 
-    # fulling the lists with valid entities and items
-    update_valid_lists()
-
     global purchase_orders
     purchase_orders = Database(initial_db_type="PurchaseOrder")
     purchase_orders.load_db()
+
+    # fulling the lists with valid entities and items
+    update_valid_lists()
 
 
 def database_debug() -> None:
@@ -125,8 +126,11 @@ def create_invoice(po_id: int) -> None:
 
     except Exception:  # Catches the Exception raised by po_instance.create_invoice if invoice already exists
         print("Send invoice anyway?")
+
         if confirm():
+            print("sending")
             send_invoice(po_id)  # Send existing invoice
+            return
         else:
             return
 
@@ -259,8 +263,7 @@ def show_all_db_i(db) -> None:
         print("Database contains no valid items.")
         return
 
-    # FIX 2: Ensure get_header returns a List[str] and cast it
-    header: Tuple[str, ...] = tuple(first_item.get_header())
+    header: Tuple[str, ...] = first_item.get_header()[0]
 
     for i in db.keys():
         line = db[i].get_i_data(entities)
@@ -282,8 +285,8 @@ def op_show_po_items():
         header_lines = get_po_item_qdata(po_instance, items)
 
         if header_lines:
-            # get_po_item_qdata likely returns a tuple (header, lines)
-            header, lines = header_lines
+            header = header_lines.pop(0)
+            lines = header_lines
             show_table(header, lines, f"PO {po_id} Items")
         else:
             print("No items found for this Purchase Order.")

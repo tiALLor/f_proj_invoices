@@ -39,9 +39,13 @@ class PurchaseOrder:
             self.invoice_issue_date
         )  # Use the property to get the date or 0
 
+        print("starting serialize")
+        print("order date:", type(self._order_date))
+        print("issue date:", type(issue_date_value))
+
         serialized = {
             "_po_id": self._po_id,
-            "order_date": self._order_date.isoformat(),
+            "order_date": self.order_date.isoformat(),
             "customer_id": self.customer_id,
             "seller_id": self.seller_id,
             "purchased_items": self.purchased_items,
@@ -52,12 +56,13 @@ class PurchaseOrder:
             else issue_date_value.isoformat(),
             "maturity": self.maturity,
         }
+        print("serialize:", serialized)
         return serialized
 
     # --- PROPERTIES AND VALIDATION ---
     @property
     def order_date(self) -> date:
-        return self._order_date
+        return date.fromisoformat(str(self._order_date))
 
     @order_date.setter
     def order_date(self, value: Union[date, str]) -> None:
@@ -71,7 +76,7 @@ class PurchaseOrder:
 
     @property
     def invoice_issue_date(self) -> date:
-        return self.invoice_issue_date
+        return date.fromisoformat(str(self._invoice_issue_date))
 
     @invoice_issue_date.setter
     def invoice_issue_date(self, value: Union[date, str, int]) -> None:
@@ -142,18 +147,20 @@ class PurchaseOrder:
             raise Exception("Invoice already created for this PO.")
 
     @staticmethod
-    def get_header() -> List[str]:
+    def get_header() -> List[Tuple]:
         """Returns a user-friendly list of column names for reports/CSV."""
         header = [
-            "PO no.",
-            "Order date",
-            "Customer no.",
-            "Customer name",
-            "Seller no.",
-            "Seller name",
-            "Invoice no.",
-            "Invoice issue date",
-            "Maturity",
+            (
+                "PO no.",
+                "Order date",
+                "Customer no.",
+                "Customer name",
+                "Seller no.",
+                "Seller name",
+                "Invoice no.",
+                "Invoice issue date",
+                "Maturity",
+            )
         ]
         return header
 
@@ -169,7 +176,7 @@ class PurchaseOrder:
 
         line: Tuple = (
             self._po_id,
-            date.isoformat(self.order_date),
+            self.order_date.isoformat(),
             self.customer_id,
             entities.db[self.customer_id].get_name(),
             self.seller_id,

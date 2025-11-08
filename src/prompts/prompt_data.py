@@ -6,6 +6,7 @@ from global_data import VALID_ITEMS_IDS_NAMES, ITEM_UNITS, VAT_CATEGORIES
 
 class QuestionConfirm(TypedDict):
     type: Literal["confirm"]
+    name: str
     message: str
     default: NotRequired[bool]
 
@@ -30,7 +31,12 @@ class QuestionList(TypedDict):
 InputQuestionData = Union[QuestionConfirm, QuestionText, QuestionList]
 
 confirm_question_data: List[InputQuestionData] = [
-    {"type": "confirm", "message": "Confirm the action?", "default": True},
+    {
+        "type": "confirm",
+        "name": "confirm",
+        "message": "Confirm the action?",
+        "default": True,
+    },
 ]
 
 entity_type_question_data: List[InputQuestionData] = [
@@ -169,7 +175,6 @@ item_question_data: List[InputQuestionData] = [
         "name": "price_per_unit",
         "message": "Price per unit [EUR] (without VAT)",
         "validate": valid_number,
-        "default": "None",
     },
     {
         "type": "list",

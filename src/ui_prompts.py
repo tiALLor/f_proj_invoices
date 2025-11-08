@@ -2,8 +2,8 @@ import inquirer
 from typing import List, Dict, Any, Union, Tuple
 from pprint import pprint
 from datetime import date
-from .prompts.query_builder import query_builder
-from .prompts.prompt_data import (
+from prompts.query_builder import query_builder
+from prompts.prompt_data import (
     confirm_question_data,
     entity_type_question_data,
     entity_questions_data,

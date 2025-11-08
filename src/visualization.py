@@ -43,10 +43,11 @@ def show_table(
     root.title(display_title)
     # Check if data exists before creating the table
     if len(tab) > 1 or (len(tab) == 1 and tab[0]):
-        _ = Table(root, tab)
+        t = Table(root, tab)
     else:
         # Display a message if no data is available
         import tkinter.messagebox as mb
 
         mb.showinfo("No Data", "No data to display in the table.")
+    # t = Table(root, tab)
     root.mainloop()

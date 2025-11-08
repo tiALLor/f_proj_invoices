@@ -153,10 +153,12 @@ def test_get_invoice_data():
     """Tests invoice data structure and due date calculation."""
     data = get_invoice_data(purchase_orders.db[1], items, entities)
 
+    print(data)
+
     # Due date should be Invoice Issue Date + Maturity (2025-01-01 + 14 days)
     assert data["due_date"] == date(2025, 1, 15)
 
     # Optional: Test key fields exist
     assert "invoice_id" in data
-    assert "invoice_items" in data
+    assert "po_item_data" in data
     assert data["invoice_id"] == 1

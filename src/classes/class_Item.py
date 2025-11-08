@@ -64,20 +64,22 @@ class Item:
         self._price_per_unit = float(value)
 
     @staticmethod
-    def get_header() -> List[str]:
+    def get_header() -> List[Tuple]:
         """Returns a user-friendly list of column names for reports/CSV."""
         # FIX: Return a flattened list of strings instead of a List[Tuple]
         return [
-            "Item no",
-            "Item name",
-            "Units",
-            "Price [EUR/U]",
-            "Vat cat.",
-            "Q-ty[units]",
-            "Netto [EUR]",
-            "VAT %",
-            "VAT[EUR]",
-            "Brutto [EUR]",
+            (
+                "Item no",
+                "Item name",
+                "Units",
+                "Price [EUR/U]",
+                "Vat cat.",
+                "Q-ty[units]",
+                "Netto [EUR]",
+                "VAT %",
+                "VAT[EUR]",
+                "Brutto [EUR]",
+            )
         ]
 
     # --- Calculation Methods (No major changes needed here) ---
@@ -143,16 +145,18 @@ class Item:
             vat_perc_str = "-"
             q_ty_str = str(q_ty)
 
-        line: Tuple = (
-            str(self._item_id),
-            self.item_name + " " + self.item_description,
-            self.item_unit,
-            str(self.price_per_unit),
-            self.vat_category,
-            q_ty_str,
-            netto_str,
-            vat_perc_str,
-            vat_str,
-            brutto_str,
-        )
-        return [line]
+        line: List[Tuple] = [
+            (
+                str(self._item_id),
+                self.item_name + " " + self.item_description,
+                self.item_unit,
+                str(self.price_per_unit),
+                self.vat_category,
+                q_ty_str,
+                netto_str,
+                vat_perc_str,
+                vat_str,
+                brutto_str,
+            )
+        ]
+        return line

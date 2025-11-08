@@ -40,9 +40,9 @@ class PDF(FPDF):
         """
 
         # Set starting position
-        # self.set_xy(x=15, y=y)
-        # self.cell(x)
-        self.set_xy(x=x, y=y)
+        self.set_xy(x=15, y=y)
+        self.cell(x)
+        # self.set_xy(x=x, y=y)
 
         # Print the underlined title (Seller/Buyer)
         self.set_font("helvetica", size=8, style="U")
@@ -63,7 +63,7 @@ def create_pdf(data: Dict[str, Any], file_name: str):
     print(file_name)
     pdf = PDF(orientation="P", unit="mm", format="A4")
     pdf.add_page()
-    pdf.add_font("DejaVu", "", r"Fonts\DejaVuSansCondensed.ttf", uni=True)
+    pdf.add_font("DejaVu", "", r"src/Fonts/DejaVuSansCondensed.ttf", uni=True)
     pdf.set_margins(left=15, top=20, right=15)
     pdf.set_auto_page_break(True, margin=10)
     pdf.set_font("helvetica", size=12)
@@ -149,7 +149,7 @@ def create_pdf(data: Dict[str, Any], file_name: str):
     )
 
     # Specify the folder where you want to save the PDF
-    output_folder = "PDF_invoice"
+    output_folder = "src/PDF_invoice"
     os.makedirs(output_folder, exist_ok=True)
 
     # Specify the full path for the PDF file
@@ -158,7 +158,7 @@ def create_pdf(data: Dict[str, Any], file_name: str):
 
 
 def main():
-    create_pdf(data='some', file_name='some')
+    create_pdf(data="some", file_name="some")
 
 
 if __name__ == "__main__":
