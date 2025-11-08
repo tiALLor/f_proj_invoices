@@ -1,7 +1,14 @@
 from datetime import date
 from typing import NotRequired, TypedDict, Callable, Literal, List, Union, Tuple
-from .validators import iban_is_valid, valid_number, valid_mail, valid_date, not_empty
-from global_data import VALID_ITEMS_IDS_NAMES, ITEM_UNITS, VAT_CATEGORIES
+from .validators import (
+    iban_is_valid,
+    valid_number,
+    valid_mail,
+    valid_date,
+    not_empty,
+    validate_if_in_VALID_ITEMS_IDS_NAMES,
+)
+from global_data import ITEM_UNITS, VAT_CATEGORIES
 
 
 class QuestionConfirm(TypedDict):
@@ -193,7 +200,7 @@ purchase_order_question_data: List[InputQuestionData] = [
         "type": "text",
         "name": "item_ID",
         "message": "Item ID to be purchased",
-        "validate": lambda _, x: int(x) in VALID_ITEMS_IDS_NAMES,
+        "validate": validate_if_in_VALID_ITEMS_IDS_NAMES,
     },
 ]
 
@@ -202,7 +209,7 @@ purchase_item_question_data: List[InputQuestionData] = [
         "type": "text",
         "name": "item_ID",
         "message": "Item ID to be purchased",
-        "validate": lambda _, x: int(x) in VALID_ITEMS_IDS_NAMES,
+        "validate": validate_if_in_VALID_ITEMS_IDS_NAMES,
     },
     {
         "type": "text",

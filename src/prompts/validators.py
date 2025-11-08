@@ -1,9 +1,11 @@
 import string
 
-from typing import Union, Any
+from typing import Dict, Union, Any
 from datetime import date
 
 from validator_collection import validators
+
+from global_data import VALID_ITEMS_IDS_NAMES
 
 
 LETTERS = {ord(d): str(i) for i, d in enumerate(string.digits + string.ascii_uppercase)}
@@ -69,6 +71,14 @@ def not_empty(_: Any, x: str) -> bool:
     except AttributeError:
         print("\nMust be a string")
     return False
+
+
+def validate_if_in_VALID_ITEMS_IDS_NAMES(answers: Any = 0, current: Union[str, int] = 0) -> bool:
+    try:
+        return int(current) in VALID_ITEMS_IDS_NAMES
+    except Exception as e:
+        # print("\n", e)
+        return False
 
 
 if __name__ == "__main__":
