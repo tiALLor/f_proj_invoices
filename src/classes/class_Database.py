@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Union, Literal, Type, Tuple
-from ui_prompts import db_i_creator
+from prompts.ui_prompts import db_i_creator
 from .class_Item import Item
 from .class_Entity import Entity, LegalEntity, IndivEntity
 from .class_PurchaseOrder import PurchaseOrder
-from parsers import parse
+from .parsers_loading import parse
 import json
 import csv
 import sys

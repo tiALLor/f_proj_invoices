@@ -1,6 +1,6 @@
 import pytest
 from datetime import date
-from .classes.class_Database import (
+from classes.class_Database import (
     IndivEntity,
     LegalEntity,
     Item,

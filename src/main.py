@@ -1,5 +1,5 @@
-from ui_prompts import get_operation
-from main_store import (
+from prompts.ui_prompts import get_operation
+from main_handlers_and_store import (
     database_initialization,
     # database_debug,
     op_entities,

@@ -45,8 +45,8 @@ def create_email_message(
 def send_email(
     to_email: str, subject: str, body: str, filename: str, attachment_path: str
 ) -> None:
-    smtp_server = "smtp.gmail.com"
-    smtp_port = 587
+    smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", 587))  # ensure it's an int
     from_email = os.getenv("EMAIL")
     password = os.getenv("PASSWORD")
 
@@ -56,7 +56,7 @@ def send_email(
 
     try:
         msg = create_email_message(
-            from_email, to_email, subject, body, filename, attachment_path
+            from_email, to_email, subject, body, filename, attachment_path  
         )
     except Exception as e:
         print(f"Could not prepare email message: {e}")

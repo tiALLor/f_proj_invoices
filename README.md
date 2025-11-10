@@ -69,7 +69,11 @@ pip install -e .
 Start the interactive CLI:
 
 ```bash
+# If you installed with pip install -e .
 python -m src.main
+
+# Or run it directly from the src directory
+cd src && python main.py
 ```
 
 Follow the on-screen prompts to:
@@ -79,30 +83,41 @@ Follow the on-screen prompts to:
 - Create purchase orders (POs)
 - Generate and send invoices (the app creates a PDF and calls the email routine)
 
-Generated PDF invoices are saved to `PDF_invoice/` (the folder is created automatically by `pdf_creator.py`). The application reads and writes JSON files stored in the `databases/` folder.
+Generated PDF invoices are saved to `src/PDF_invoice/` (the folder is created automatically by `pdf_creator.py`). The application reads and writes JSON files stored in the `src/databases/` folder.
 
 ## Project layout
 
-- `main.py` — CLI entry point and application flow.
-- `class_Database.py` — Database wrapper and load/store helpers.
-- `class_Entity.py` — Entity classes (individual/legal) and helpers.
-- `class_Item.py` — Item representation and pricing helpers.
-- `class_PurchaseOrder.py` — PurchaseOrder class and invoice creation metadata.
-- `pdf_creator.py` — Creates PDF invoices (uses `fpdf`).
-- `email_service.py` — Email sending helper (reads `.env`/config; ensure SMTP configured).
-- `prompts.py` — Interactive prompts & input validation for the CLI.
-- `functions.py` — Utility functions used to assemble invoice data.
-- `parsers.py` — Input parsing helpers.
-- `validators.py` — Additional validation routines.
-- `visualization.py` — Simple table display helpers.
-- `test_main.py` — Basic tests (run with `pytest`).
-- `databases/` — JSON files that store Entities, Items and PurchaseOrders.
-- `Fonts/` — Fonts used by the PDF generator (DejaVu fonts included).
-- `PDF_invoice/` — Output folder for generated invoice PDFs (created at runtime).
+The project uses a src-layout with all Python modules under the `src/` directory:
 
-## Databases & sample files
+- `src/main.py` — CLI entry point and application flow.
+- `src/class_Database.py` — Database wrapper and load/store helpers.
+- `src/class_Entity.py` — Entity classes (individual/legal) and helpers.
+- `src/class_Item.py` — Item representation and pricing helpers.
+- `src/class_PurchaseOrder.py` — PurchaseOrder class and invoice creation metadata.
+- `src/pdf_creator.py` — Creates PDF invoices (uses `fpdf2`).
+- `src/email_service.py` — Email sending helper (reads `.env`/config; ensure SMTP configured).
+- `src/cli_prompts.py` — Interactive CLI prompts and global state.
+- `src/functions.py` — Utility functions used to assemble invoice data.
+- `src/parsers.py` — Input parsing helpers.
+- `src/visualization.py` — Simple table display helpers.
+- `src/test_main.py` — Basic tests (run with `pytest`).
 
-The following JSON files are used to persist data (stored in `databases/`):
+Prompts package (input validation and prompt definitions):
+
+- `src/prompts/` — Package containing prompt-related modules
+  - `validators.py` — Input validation functions
+  - `prompt_data.py` — Question type definitions and data
+  - `query_builder.py` — Helpers to construct inquirer prompts
+
+Data directories:
+
+- `src/databases/` — JSON files that store Entities, Items and PurchaseOrders.
+- `src/Fonts/` — Fonts used by the PDF generator (DejaVu fonts included).
+- `src/PDF_invoice/` — Output folder for generated invoice PDFs (created at runtime).
+
+## Databases & configuration
+
+The following JSON files are used to persist data (stored in `src/databases/`):
 
 - `database_entities.json` — entities/customers/sellers
 - `database_items.json` — items/products/services
@@ -110,21 +125,56 @@ The following JSON files are used to persist data (stored in `databases/`):
 
 These files are read and written by the `Database` class. If files are missing on first run, the application tries to create or initialize them.
 
-## Running tests
+### Email configuration
 
-Run the test suite with pytest:
+To use the email feature (sending invoices), copy `.env.example` to `.env` and configure your SMTP settings:
 
 ```bash
-pytest -q
+cp .env.example .env
+# Edit .env with your email configuration
 ```
 
-There is a `test_main.py` in the repo. Tests are lightweight and expect the project to run in a virtual env with the dependencies installed.
+Required settings in `.env`:
+
+- `SMTP_SERVER` - Your SMTP server address
+- `SMTP_PORT` - SMTP port (usually 587 for TLS)
+- `SMTP_USERNAME` - Your email username/address
+- `SMTP_PASSWORD` - Your email password or app-specific password
+
+## Running tests
+
+Run the test suite with pytest (make sure you're in the project root):
+
+```bash
+# Run all tests
+python -m pytest src/test_main.py -v
+
+# Run specific test
+python -m pytest src/test_main.py -v -k "test_get_invoice_price"
+```
+
+Tests are lightweight and expect the project to run in a virtual environment with the dependencies installed. The test file `src/test_main.py` includes basic functionality tests for invoices, items, and purchase orders.
 
 ## Notes & known issues
 
+### Path handling
+
 - Some paths in the code use Windows-style backslashes (e.g. `Fonts\\...` and `PDF_invoice\\...`). On Linux these should still generally work with Python (OS path handling), but you may want to change them to use `os.path.join()` or forward slashes for better portability.
-- The email sending routine requires SMTP configuration (check `.env.example` and set real credentials in a `.env` file if you intend to use the email feature).
-- The `pyproject.toml` lists dependencies
+- The project uses a src-layout, so all Python modules and data files are under the `src/` directory.
+
+### Dependencies & configuration
+
+- Dependencies are managed through `pyproject.toml`. Use `pip install -e .` to install in development mode.
+- The email sending routine requires SMTP configuration in `.env` (see [Email configuration](#email-configuration)).
+
+### Code organization
+
+- CLI prompts and interactions are handled by `src/cli_prompts.py`.
+- The `src/prompts/` package contains reusable prompt components:
+  - Type definitions (`prompt_data.py`)
+  - Input validation (`validators.py`)
+  - Prompt construction helpers (`query_builder.py`)
+- Use absolute imports from the src root (e.g. `from cli_prompts import ...`).
 
 ## License
 

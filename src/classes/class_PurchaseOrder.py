@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import ClassVar, List, Dict, Tuple, Union, Any
 from datetime import date
 from global_data import VALID_ENTITIES, VALID_ITEMS_IDS_NAMES
-from ui_prompts import invoice
+from prompts.ui_prompts import invoice
 
 
 @dataclass

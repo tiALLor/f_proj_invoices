@@ -7,12 +7,12 @@ from classes.class_Database import (
     Database,
     Entity,
 )
-from ui_prompts import confirm, get_po_number
+from prompts.ui_prompts import confirm, get_po_number
 from global_data import VALID_ENTITIES, VALID_ITEMS_IDS_NAMES
-from visualization import show_table
+from services.visualization import show_table
 from data_formatting import get_invoice_data, get_po_item_qdata
-from pdf_creator import create_pdf
-from email_service import send_email
+from services.pdf_creator import create_pdf
+from services.email_service import send_email
 from typing import List, Optional, Tuple, Union, Dict
 import sys
 
